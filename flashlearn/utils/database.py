@@ -30,24 +30,14 @@ class DatabaseManager:
         tables = [
             '''
             CREATE TABLE IF NOT EXISTS USER (
+                id INTEGER PRIMARY KEY,
                 email TEXT PRIMARY KEY,
                 password TEXT,
                 name TEXT
             )
             ''',
             '''
-            CREATE TABLE IF NOT EXISTS FLASHCARD (
-                id INTEGER PRIMARY KEY,
-                text TEXT,
-                image_url TEXT,
-                user_id INTEGER,
-                set_id INTEGER,
-                FOREIGN KEY (user_id) REFERENCES USER (id),
-                FOREIGN KEY (set_id) REFERENCES SET (id)
-            )
-            ''',
-            '''
-            CREATE TABLE IF NOT EXISTS SET (
+            CREATE TABLE IF NOT EXISTS SUPERSET (
                 id INTEGER PRIMARY KEY,
                 name TEXT,
                 user_id INTEGER,
@@ -55,27 +45,23 @@ class DatabaseManager:
             )
             ''',
             '''
-            CREATE TABLE IF NOT EXISTS STUDY_SESSION (
+            CREATE TABLE IF NOT EXISTS SET (
                 id INTEGER PRIMARY KEY,
-                start_time DATETIME,
-                end_time DATETIME,
+                name TEXT,
                 user_id INTEGER,
+                super_id INTEGER,
                 FOREIGN KEY (user_id) REFERENCES USER (id)
+                FOREIGN KEY (super_id) REFERENCES SUPERSET (id)
             )
             ''',
             '''
-            CREATE TABLE IF NOT EXISTS SESSION_FLASHCARD (
-                session_id INTEGER,
-                flashcard_id INTEGER,
-                correct INTEGER,
-                FOREIGN KEY (session_id) REFERENCES STUDY_SESSION (id),
-                FOREIGN KEY (flashcard_id) REFERENCES FLASHCARD (id)
-            )
-            ''',
-            '''
-            CREATE TABLE IF NOT EXISTS SHARED_SET (
+            CREATE TABLE IF NOT EXISTS FLASHCARD (
+                id INTEGER PRIMARY KEY,
+                term TEXT,
+                body TEXT,
+                user_id INTEGER,
                 set_id INTEGER,
-                receiver_email TEXT,
+                FOREIGN KEY (user_id) REFERENCES USER (id),
                 FOREIGN KEY (set_id) REFERENCES SET (id)
             )
             '''
@@ -87,18 +73,28 @@ class DatabaseManager:
     def close_connection(self):
         self.connection.close()
 
-    def insert_into_table(self, table_name, **kwargs) -> list:
+    def insert_into_table(self, table_name, **kwargs) -> None:
         columns = ', '.join(kwargs.keys())
         placeholders = ', '.join('?' * len(kwargs))
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-        return self.execute_query(query, tuple(kwargs.values()))
+        self.execute_query(query, tuple(kwargs.values()))
 
-    def select_from_table(self, table_name, *columns) -> list:
+    def select_from_table(self, table_name, *columns, **kwargs) -> list:
+        '''
+        Sample usage: 
+          ```cards = select_from_table("FLASHCARD", "term", "body", user_id=1)```
+        this will return all terms and bodies of the rows in the FLASHCARD table where user_id is 1
+        '''
         if columns:
             query = f"SELECT {', '.join(columns)} FROM {table_name}"
         else:
             query = f"SELECT * FROM {table_name}"
-        return self.execute_query(query)
+        if kwargs:
+            conditions = ' AND '.join(f"{key} = ?" for key in kwargs.keys())
+            query += f" WHERE {conditions}"
+            return self.execute_query(query, tuple(kwargs.values()))
+        else:
+            return self.execute_query(query)
     
     def remove_from_table(self, table_name, **kwargs) -> list:
         query = f"DELETE FROM {table_name} WHERE {list(kwargs.keys())[0]} = ?"
