@@ -10,43 +10,33 @@ accessibility for a broad user base."
 ```mermaid
 erDiagram
     USER {
-        string email PK
-        string password
-        string name
+        INTEGER id PK
+        TEXT email
+        TEXT password
+        TEXT name
     }
-    FLASHCARD {
-        int id PK
-        string text
-        string image_url
-        int user_id FK
-        int set_id FK
+    SUPERSET {
+        INTEGER id PK
+        TEXT name
+        INTEGER user_id FK
     }
     SET {
-        int id PK
-        string name
-        int user_id FK
+        INTEGER id PK
+        TEXT name
+        INTEGER user_id FK
+        INTEGER super_id FK
     }
-    STUDY_SESSION {
-        int id PK
-        datetime start_time
-        datetime end_time
-        int user_id FK
-    }
-    SESSION_FLASHCARD {
-        int session_id FK
-        int flashcard_id FK
-        boolean correct
-    }
-    SHARED_SET {
-        int set_id FK
-        string receiver_email
+    FLASHCARD {
+        INTEGER id PK
+        TEXT term
+        TEXT body
+        INTEGER user_id FK
+        INTEGER set_id FK
     }
 
-    USER ||--o{ FLASHCARD : "creates/owns"
-    USER ||--o{ SET : "creates/owns"
+    USER ||--o{ SUPERSET : "has"
+    USER ||--o{ SET : "has"
+    USER ||--o{ FLASHCARD : "has"
+    SUPERSET ||--o{ SET : "contains"
     SET ||--o{ FLASHCARD : "contains"
-    USER ||--o{ STUDY_SESSION : "has"
-    STUDY_SESSION ||--o{ SESSION_FLASHCARD : "includes"
-    FLASHCARD ||--o{ SESSION_FLASHCARD : "reviewed in"
-    SET ||--o{ SHARED_SET : "shared"
 ```
