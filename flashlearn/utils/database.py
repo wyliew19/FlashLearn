@@ -1,5 +1,6 @@
 import sqlite3
 import threading
+from typing import Optional
 
 from typing import Optional
 
@@ -16,7 +17,8 @@ class DatabaseManager:
     def __init__(self):
         self.create_tables()
 
-    def execute_query(self, query: str, params: Optional[str]) -> list:
+
+    def execute_query(self, query: str, params: Optional[tuple]) -> list:
         with self.lock:  # Acquire lock
             cursor = self.connection.cursor()
             if params:
@@ -98,26 +100,13 @@ class DatabaseManager:
         else:
             return self.execute_query(query)
         
-    def union_select(self, table1: str, table2: str, *columns, **kwargs) -> list:
+    def update_table(self, table_name: str, new_vals: dict, **kwargs):
         '''
         Sample usage:
-          ```cards = union_select("SET", "SUPERSET", "title", user_id=1)```
-        this will return all titles of the rows in the SET and SUPERSET tables where user_id is 1'''
-        query = f"SELECT {', '.join(columns)} FROM {table1} UNION SELECT {', '.join(columns)} FROM {table2}"
-        if kwargs:
-            conditions = ' AND '.join(f"{key} = ?" for key in kwargs.keys())
-            query += f" WHERE {conditions}"
-            return self.execute_query(query, tuple(kwargs.values()))
-        else:
-            return self.execute_query(query)
-        
-    def update_table(self, table_name: str, set_dict: dict, where_dict: dict) -> list:
-        """set_dict = {'column_name': 'new_value'}
-           where_dict = {'column_name': 'value'}"""
-        set_columns = ', '.join(f"{key} = ?" for key in set_dict.keys())
-        where_columns = ' AND '.join(f"{key} = ?" for key in where_dict.keys())
-        query = f"UPDATE {table_name} SET {set_columns} WHERE {where_columns}"
-        return self.execute_query(query, tuple(set_dict.values()) + tuple(where_dict.values()))
+          ```update_table("FLASHCARD", {"term": "new term"}, id=1)```
+        this will update the term of the row in the FLASHCARD table where the flashcard's id is 1'''
+        query = f"UPDATE {table_name} SET {list(new_vals.keys())[0]} = ? WHERE {list(kwargs.keys())[0]} = ?"
+        return self.execute_query(query, tuple(new_vals.values()) + tuple(kwargs.values()))
     
     def remove_from_table(self, table_name: str, **kwargs) -> list:
         query = f"DELETE FROM {table_name} WHERE {list(kwargs.keys())[0]} = ?"
