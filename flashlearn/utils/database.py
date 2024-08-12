@@ -1,5 +1,6 @@
 import sqlite3
 import threading
+from typing import Optional
 
 class DatabaseManager:
     _instance = None
@@ -14,7 +15,7 @@ class DatabaseManager:
     def __init__(self):
         self.create_tables()
 
-    def execute_query(self, query, params=None) -> list:
+    def execute_query(self, query: str, params: Optional[tuple]) -> list:
         with self.lock:  # Acquire lock
             cursor = self.connection.cursor()
             if params:
@@ -73,7 +74,7 @@ class DatabaseManager:
     def close_connection(self):
         self.connection.close()
 
-    def insert_into_table(self, table_name, **kwargs) -> None:
+    def insert_into_table(self, table_name: str, **kwargs) -> None:
         columns = ', '.join(kwargs.keys())
         placeholders = ', '.join('?' * len(kwargs))
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
@@ -95,6 +96,14 @@ class DatabaseManager:
             return self.execute_query(query, tuple(kwargs.values()))
         else:
             return self.execute_query(query)
+        
+    def update_table(self, table_name: str, new_vals: dict, **kwargs):
+        '''
+        Sample usage:
+          ```update_table("FLASHCARD", {"term": "new term"}, id=1)```
+        this will update the term of the row in the FLASHCARD table where the flashcard's id is 1'''
+        query = f"UPDATE {table_name} SET {list(new_vals.keys())[0]} = ? WHERE {list(kwargs.keys())[0]} = ?"
+        return self.execute_query(query, tuple(new_vals.values()) + tuple(kwargs.values()))
     
     def remove_from_table(self, table_name, **kwargs) -> list:
         query = f"DELETE FROM {table_name} WHERE {list(kwargs.keys())[0]} = ?"

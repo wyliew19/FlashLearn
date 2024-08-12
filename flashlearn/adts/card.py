@@ -9,7 +9,7 @@ class Card:
     """Question on card"""
     body: str
     """Answer on card"""
-    set_id: int
-    """ID of set card belongs to"""
     user_id: int
     """ID of user who created card"""
+    set_id: int
+    """ID of set card belongs to"""
