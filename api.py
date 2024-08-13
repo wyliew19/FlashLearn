@@ -5,16 +5,22 @@ from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
+
 from typing import Annotated
 from pathlib import Path
+
 from flashlearn.deps import get_current_user, get_user_handler, ensure_not_logged_in, get_set_handler
 from flashlearn.utils.user_handler import UserHandler
 from flashlearn.utils.set_handler import SetHandler
+from flashlearn.utils.database import DatabaseManager
 from flashlearn.adts.user import User
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path("./static").resolve()), name="static")
 templates = Jinja2Templates(directory=Path("./interface").resolve())
+
+# Ensure database is created
+DatabaseManager()
 
 # Token route for user authentication
 @app.post("/token")
