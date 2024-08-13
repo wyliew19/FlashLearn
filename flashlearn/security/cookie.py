@@ -24,6 +24,6 @@ class OAuth2WithCookie(OAuth2):
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "bearer":
             if self.auto_error:
-                raise HTTPException(status_code=401, detail="Not authenticated", headers={"WWW-Authenticate": "Bearer"})
+                raise HTTPException(status_code=302, detail="Not authenticated", headers={"WWW-Authenticate": "Bearer", "Location": "/login"})
             return None
         return param

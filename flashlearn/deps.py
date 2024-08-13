@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Request
 from flashlearn.security.cookie import OAuth2WithCookie
 from flashlearn.models.user import User
 from flashlearn.utils.user_handler import UserHandler
@@ -15,11 +15,8 @@ def get_current_user(email: Annotated[str, Depends(oauth2_scheme)]) -> User:
         raise HTTPException(status_code=401, detail="Invalid username or password", headers={"WWW-Authenticate": "Bearer"})
     return user
 
-def ensure_not_logged_in(email: Annotated[str, Depends(oauth2_scheme)]):
-    handler = UserHandler()
-    user = handler.get_user(email)
-    if user is not None:
-        # Redirect to the home page
+def ensure_not_logged_in(request: Request):
+    if request.cookies.get("access_token"):
         return True
     return False
 

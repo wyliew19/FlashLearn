@@ -1,10 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>FlashLearn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to FlashLearn!</title>
+    <link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
 </head>
+
 <body>
-    <h1>Welcome to Flashlearn</h1>
-    <p>rough start..</p>
+    <div class="title-bar">
+        <a class="message">Welcome!</a>
+        <a class="title">FlashLearn</a>
+        <a class="logout-button" href="/login/">Login</a>
+    </div>
+    <nav class="navbar">
+        <a href="/home/" class="nav-item">Home</a>
+        <a href="/sets/" class="nav-item">My Sets</a>
+        <a href="/create_set/" class="nav-item">Create a Set</a>
+    </nav>
+    
+    <div>
+        <h1>Welcome to FlashLearn!</h1>
+        <p>
+            Welcome to the landing page, please use the navigation bar to browse the website!
+        </p>
+    </div>
+    <div>
+        <h2 style="padding-top: 5%;">About FlashLearn</h2>
+        <p>
+            This is a flashcard website that allows you to create and study flashcards. With the
+            ability to create SUPER sets, you can group multiple sets together organize your studies
+            throughout the semester!
+        </p>
+    </div>
+    <footer>
+        <p><small>Created by: Will Wylie, Hassan Jammal, Athira Nakkara, Hussein Chamas</small></p>
+    </footer>
 </body>
+
 </html>

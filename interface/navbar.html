@@ -1,0 +1,12 @@
+<link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
+
+<div class="top-bar">
+    <a class=message>Welcome, {{ user.name }}!</a>
+    <h1 class="title">FlashLearn</h1>
+    <a class="logout-button" href="/logout/">Logout</a>
+</div>
+<nav class="navbar">
+    <a href="/home/" class="nav-item">Home</a>
+    <a href="/sets/" class="nav-item">My Sets</a>
+    <a href="/create_set/" class="nav-item">Create a Set</a>
+</nav>

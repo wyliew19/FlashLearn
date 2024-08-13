@@ -1,0 +1,34 @@
+/* Import the 'Kaisei Decol' font */
+@import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol&display=swap');
+
+/* Set the base font family */
+body {
+    font-family: 'Kaisei Decol', serif;
+    font-size: large;
+    text-align: center;
+}
+
+/* Set the base font color */
+h1 {
+    font-size: 2em;
+}
+
+p {
+    font-size: 1.5em;
+    text-wrap: wrap;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+/* Set smaller text to a standard font for readability */
+small {
+    font-family: Arial, sans-serif;
+}
+
+footer {
+    margin-top: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

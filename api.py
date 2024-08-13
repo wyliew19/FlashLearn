@@ -17,6 +17,7 @@ from flashlearn.models.user import User
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path("./static").resolve()), name="static")
+app.mount("/assets", StaticFiles(directory=Path("./interface/assets").resolve()), name="assets")
 templates = Jinja2Templates(directory=Path("./interface").resolve())
 
 # Ensure database is created
@@ -107,13 +108,13 @@ def logout(response: Response):
 @app.get("/sets")
 def get_sets(request: Request, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
     sets = handler.get_user_sets(user.email)
-    return templates.TemplateResponse("sets.html", {"request": request, "sets": sets})
+    return templates.TemplateResponse("sets.html", {"request": request, "sets": sets, "user": user})
 
 # Get set
 @app.get("/set/{set_id}")
-def get_set(request: Request, set_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)]):
+def get_set(request: Request, set_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
     set = handler.get_set(set_id)
-    return templates.TemplateResponse("set.html", {"request": request, "set": set})
+    return templates.TemplateResponse("set.html", {"request": request, "set": set, "user": user})
 
 # Create set
 @app.get("/create_set")
