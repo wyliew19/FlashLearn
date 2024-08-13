@@ -18,7 +18,7 @@ class DatabaseManager:
         self.create_tables()
 
 
-    def execute_query(self, query: str, params: Optional[tuple]) -> list:
+    def execute_query(self, query: str, params: Optional[tuple] = None) -> list:
         with self.lock:  # Acquire lock
             cursor = self.connection.cursor()
             if params:
@@ -34,10 +34,11 @@ class DatabaseManager:
         tables = [
             '''
             CREATE TABLE IF NOT EXISTS USER (
-                id INTEGER PRIMARY KEY,
-                email TEXT PRIMARY KEY,
+                id INTEGER,
+                email TEXT,
                 password TEXT,
-                name TEXT
+                name TEXT,
+                PRIMARY KEY (id, email)
             )
             ''',
             '''
@@ -49,12 +50,12 @@ class DatabaseManager:
             )
             ''',
             '''
-            CREATE TABLE IF NOT EXISTS SET (
+            CREATE TABLE IF NOT EXISTS SUBSET (
                 id INTEGER PRIMARY KEY,
                 name TEXT,
                 user_id INTEGER,
                 super_id INTEGER,
-                FOREIGN KEY (user_id) REFERENCES USER (id)
+                FOREIGN KEY (user_id) REFERENCES USER (id),
                 FOREIGN KEY (super_id) REFERENCES SUPERSET (id)
             )
             ''',
@@ -67,7 +68,7 @@ class DatabaseManager:
                 set_id INTEGER,
                 studied BOOLEAN DEFAULT FALSE,
                 FOREIGN KEY (user_id) REFERENCES USER (id),
-                FOREIGN KEY (set_id) REFERENCES SET (id)
+                FOREIGN KEY (set_id) REFERENCES SUBSET (id)
             )
             '''
         ]

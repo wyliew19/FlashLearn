@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Depends
 from flashlearn.security.cookie import OAuth2WithCookie
-from flashlearn.adts.user import User
+from flashlearn.models.user import User
 from flashlearn.utils.user_handler import UserHandler
 from flashlearn.utils.set_handler import SetHandler
 

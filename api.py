@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, Request, HTTPException, Form
-from fastapi.responses import Response, RedirectResponse
+from fastapi.responses import Response, RedirectResponse, FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -13,7 +13,7 @@ from flashlearn.deps import get_current_user, get_user_handler, ensure_not_logge
 from flashlearn.utils.user_handler import UserHandler
 from flashlearn.utils.set_handler import SetHandler
 from flashlearn.utils.database import DatabaseManager
-from flashlearn.adts.user import User
+from flashlearn.models.user import User
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path("./static").resolve()), name="static")
@@ -35,6 +35,11 @@ def login(form: Annotated[OAuth2PasswordRequestForm, Depends()], handler: Annota
 @app.get("/")
 def landing_page(request: Request):
     return templates.TemplateResponse("root.html", {"request": request})
+
+@app.get('/favicon.ico')
+async def favicon():
+    file_name = "favicon.ico"
+    return FileResponse(Path(f"./static/{file_name}"), headers={"Content-Disposition": "attachment; filename=" + file_name})
 
 
 # Login page

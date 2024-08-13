@@ -1,5 +1,5 @@
 from flashlearn.utils.database import DatabaseManager
-from flashlearn.adts.user import User
+from flashlearn.models.user import User
 import hashlib
 
 class UserHandler:
