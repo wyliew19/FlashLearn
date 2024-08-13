@@ -65,6 +65,7 @@ class DatabaseManager:
                 body TEXT,
                 user_id INTEGER,
                 set_id INTEGER,
+                studied BOOLEAN DEFAULT FALSE,
                 FOREIGN KEY (user_id) REFERENCES USER (id),
                 FOREIGN KEY (set_id) REFERENCES SET (id)
             )

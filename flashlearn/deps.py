@@ -2,7 +2,7 @@ from fastapi import HTTPException, Depends
 from flashlearn.security.cookie import OAuth2WithCookie
 from flashlearn.adts.user import User
 from flashlearn.utils.user_handler import UserHandler
-from fastapi.responses import RedirectResponse
+from flashlearn.utils.set_handler import SetHandler
 
 from typing import Annotated
 
@@ -25,3 +25,6 @@ def ensure_not_logged_in(email: Annotated[str, Depends(oauth2_scheme)]):
 
 def get_user_handler():
     return UserHandler()
+
+def get_set_handler():
+    return SetHandler()

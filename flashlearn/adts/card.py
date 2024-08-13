@@ -13,3 +13,5 @@ class Card:
     """ID of user who created card"""
     set_id: int
     """ID of set card belongs to"""
+    studied: bool
+    """Whether card has been studied"""
