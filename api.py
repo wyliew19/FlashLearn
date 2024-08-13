@@ -5,10 +5,8 @@ from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
-
 from typing import Annotated
 from pathlib import Path
-
 from flashlearn.deps import get_current_user, get_user_handler, ensure_not_logged_in, get_set_handler
 from flashlearn.utils.user_handler import UserHandler
 from flashlearn.utils.set_handler import SetHandler
@@ -243,7 +241,6 @@ def study_card(card_id: int, handler: Annotated[SetHandler, Depends(get_set_hand
 
 
 
-
 ### Run the server ###
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, workers=4)

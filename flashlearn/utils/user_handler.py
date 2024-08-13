@@ -1,5 +1,6 @@
 from flashlearn.utils.database import DatabaseManager
 from flashlearn.adts.user import User
+import hashlib
 
 class UserHandler:
     def __init__(self):
@@ -7,6 +8,7 @@ class UserHandler:
 
     def login(self, user: str, password: str) -> User:
         print(f"DEBUG::User Handler::login({user}, {password})")
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
         info = self._db.select_from_table("USER", email=user, password=password)
         if not info:
             info = self._db.select_from_table("USER", name=user, password=password)
@@ -16,7 +18,8 @@ class UserHandler:
     
     def register(self, user: str, password: str, email: str):
         print(f"DEBUG::User Handler::register({user}, {password}, {email})")
-        self._db.insert_into_table("USER", name=user, password=password, email=email)
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        self._db.insert_into_table("USER", name=user, password=hashed_password, email=email)
         info = self.login(user, password)
         if not info:
             return None
