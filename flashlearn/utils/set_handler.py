@@ -21,6 +21,7 @@ class SetHandler:
         info = self._db.select_from_table("SUBSET", title=name, user_id=user_id)
         if not info:
             return None
+        info = info[0]
         return Set(info[0], info[1], [])
     
     def create_super_set(self, name: str, user_id: int):
@@ -31,6 +32,7 @@ class SetHandler:
         info = self._db.select_from_table("SUPERSET", title=name, user_id=user_id)
         if not info:
             return None
+        info = info[0]
         return SuperSet(info[0], info[1], [])
     
     def _populate_set(self, set_id: int):
@@ -52,6 +54,7 @@ class SetHandler:
         # Get set info
         info = self._db.select_from_table("SUBSET", id=set_id)
         # Return set object
+        info = info[0]
         return Set(info[0], info[1], self._populate_set(set_id))
     
     def get_super_set(self, super_id: int) -> SuperSet:
@@ -59,6 +62,7 @@ class SetHandler:
         # Get super set info
         info = self._db.select_from_table("SUPERSET", id=super_id)
         # Return super set object
+        info = info[0]
         return SuperSet(info[0], info[1], self._populate_super_set(super_id))
     
     def get_user_sets(self, user_id: int) -> list[AbstractSet]:
@@ -86,6 +90,7 @@ class SetHandler:
         info = self._db.select_from_table("SUBSET", id=set_id)
         if not info:
             return None
+        info = info[0]
         return Set(info[0], info[1], self._populate_set(set_id))
 
     def delete_set(self, set_id: int):
@@ -98,7 +103,7 @@ class SetHandler:
             return True
         return False
 
-    def add_card_to_set(self, set_id: int, user_id: int, term: str, body: str):
+    def add_card_to_set(self, set_id: int, user_id: int, term: str, body: str) -> Card:
         print(f"DEBUG::Set Handler::add_card_to_set({set_id}, {user_id}, \"{term}\", \"{body}\")")
         # Insert card into database
         self._db.insert_into_table("FLASHCARD", term=term, body=body, user_id=user_id, set_id=set_id)
@@ -106,16 +111,18 @@ class SetHandler:
         info = self._db.select_from_table("FLASHCARD", term=term, body=body, user_id=user_id, set_id=set_id)
         if not info:
             return None
-        return info
+        info = info[0]
+        return Card(*info)
 
     def get_card(self, card_id: int) -> Card:
         print(f"DEBUG::Set Handler::get_card({card_id})")
         # Get card info
         info = self._db.select_from_table("FLASHCARD", id=card_id)
         # Return card object
+        info = info[0]
         return Card(*info)
     
-    def edit_card(self, card_id: int, new_term: Optional[str], new_body: Optional[str]):
+    def edit_card(self, card_id: int, new_term: Optional[str], new_body: Optional[str]) -> Card:
         print(f"DEBUG::Set Handler::edit_card({card_id}, \"{new_term}\", \"{new_body}\")")
         if not new_term and not new_body:
             return None
@@ -130,7 +137,8 @@ class SetHandler:
         info = self._db.select_from_table("FLASHCARD", id=card_id)
         if not info:
             return None
-        return info
+        info = info[0]
+        return Card(*info)
     
     def delete_card(self, card_id: int):
         print(f"DEBUG::Set Handler::delete_card({card_id})")
@@ -150,7 +158,8 @@ class SetHandler:
         info = self._db.select_from_table("FLASHCARD", id=card_id)
         if not info:
             return None
-        return info
+        info = info[0]
+        return Card(*info)
     
     def get_unstudied_cards(self, card_id: int) -> list[Card]:
         print(f"DEBUG::Set Handler::get_unstudied_cards({card_id})")

@@ -2,8 +2,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #333;
+    background-color: #015ab9;
     overflow: hidden;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
     width: 100%;
 }
 
@@ -15,12 +17,12 @@
     width: 100%;
     border-right: 1px solid #f0f0f0;
     border-left: 1px solid #f0f0f0;
+    transition: background 0.3s ease-in-out;
 }
 
 .navbar a:hover {
-    background-color: #ddd;
+    background-color: #99caff;
     color: black;
-    transition: background 0.5s ease-in-out;
 }
 
 .navbar .title {
@@ -54,18 +56,18 @@
     width: 10%;
     padding: 4px;
     margin-top: 5px;
-    border: 1px solid #11559e;
-    background-color: #5a9de5;
+    border: 1px solid #3131ff;
+    background-color: #00f;
+    transition: background 0.3s ease-out;
     border-radius: 5px;
     box-shadow: none;
-    transition: border-color 0.3s ease;
     color: #fff;
     text-align: center;
     text-decoration: none;
     align-self: right;
 }
 
-.top-bar .logout-button:hover {
-    background-color: #002e5f;
-    border-color: #002e5f;
+.title-bar .logout-button:hover {
+    background-color: #0000b4;
+    border-color: rgb(107, 107, 255);
 }

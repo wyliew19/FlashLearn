@@ -8,6 +8,8 @@ from typing import Annotated
 
 oauth2_scheme = OAuth2WithCookie(tokenUrl="/token")
 
+# Dependency injections used for authentication, authorization, and database access
+
 def get_current_user(email: Annotated[str, Depends(oauth2_scheme)]) -> User:
     handler = UserHandler()
     user = handler.get_user(email)

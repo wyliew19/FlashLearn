@@ -25,7 +25,7 @@ DatabaseManager()
 
 # Token route for user authentication
 @app.post("/token")
-def login(form: Annotated[OAuth2PasswordRequestForm, Depends()], handler: Annotated[UserHandler, Depends(get_user_handler)], response: Response):
+def login_token(form: Annotated[OAuth2PasswordRequestForm, Depends()], handler: Annotated[UserHandler, Depends(get_user_handler)], response: Response):
     user = handler.login(form.username, form.password)
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid username or password", headers={"WWW-Authenticate": "Bearer"})
@@ -65,7 +65,7 @@ def login(form: Annotated[OAuth2PasswordRequestForm, Depends()],
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid username or password", headers={"WWW-Authenticate": "Bearer"})
     response.set_cookie(key="access_token", value=f'bearer {user.email}')
-    return RedirectResponse(url="/home")
+    return {"access_token": user.email, "token_type": "bearer"}
 
 
 # Register page
@@ -78,24 +78,29 @@ def register_page(logged_in: Annotated[bool, Depends(ensure_not_logged_in)], req
     return templates.TemplateResponse("register.html", {"request": request})
 
 @app.post("/register")
-def register(form: Annotated[OAuth2PasswordRequestForm, Depends()],
-             handler: Annotated[UserHandler, Depends(get_user_handler)], 
+def register(handler: Annotated[UserHandler, Depends(get_user_handler)], 
              logged_in: Annotated[bool, Depends(ensure_not_logged_in)],
-             response: Response):
+             response: Response, username: str = Form(), password: str = Form(), 
+             email: str = Form()):
     
     if logged_in:
         return RedirectResponse(url="/home")
     
-    user = handler.register(form.username, form.password, form.email)
+    user = handler.register(username, password, email)
+    # If user is None, registration failed
     if user is None:
-        raise HTTPException(status_code=401, detail="Invalid username or password", headers={"WWW-Authenticate": "Bearer"})
+        raise HTTPException(status_code=500, detail="Failed to register user")
     response.set_cookie(key="access_token", value=f'bearer {user.email}')
-    return RedirectResponse(url="/home")
+    return {"access_token": user.email, "token_type": "bearer"}
 
 
 # Home page
 @app.get("/home")
 def home_page(request: Request, user: Annotated[User, Depends(get_current_user)]):
+    return templates.TemplateResponse("home.html", {"request": request, "user": user})
+
+@app.post("/home")
+def home_page_post(request: Request, user: Annotated[User, Depends(get_current_user)]):
     return templates.TemplateResponse("home.html", {"request": request, "user": user})
 
 # Logout
@@ -255,4 +260,4 @@ def study_card(card_id: int, handler: Annotated[SetHandler, Depends(get_set_hand
 
 ### Run the server ###
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000, workers=4)
+    uvicorn.run(app, host="0.0.0.0")

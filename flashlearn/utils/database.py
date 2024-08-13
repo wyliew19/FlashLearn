@@ -34,11 +34,10 @@ class DatabaseManager:
         tables = [
             '''
             CREATE TABLE IF NOT EXISTS USER (
-                id INTEGER,
-                email TEXT,
+                id INTEGER PRIMARY KEY,
+                email TEXT UNIQUE,
                 password TEXT,
-                name TEXT,
-                PRIMARY KEY (id, email)
+                name TEXT
             )
             ''',
             '''
@@ -85,7 +84,7 @@ class DatabaseManager:
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
         self.execute_query(query, tuple(kwargs.values()))
 
-    def select_from_table(self, table_name, *columns, **kwargs) -> list:
+    def select_from_table(self, table_name, *columns, **kwargs) -> list[tuple]:
         '''
         Sample usage: 
           ```cards = select_from_table("FLASHCARD", "term", "body", user_id=1)```
@@ -110,6 +109,6 @@ class DatabaseManager:
         query = f"UPDATE {table_name} SET {list(new_vals.keys())[0]} = ? WHERE {list(kwargs.keys())[0]} = ?"
         return self.execute_query(query, tuple(new_vals.values()) + tuple(kwargs.values()))
     
-    def remove_from_table(self, table_name: str, **kwargs) -> list:
+    def remove_from_table(self, table_name: str, **kwargs) -> list[tuple]:
         query = f"DELETE FROM {table_name} WHERE {list(kwargs.keys())[0]} = ?"
         return self.execute_query(query, tuple(kwargs.values()))

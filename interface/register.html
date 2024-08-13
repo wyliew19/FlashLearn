@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlashLearn - Register</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
 </head>
 <body>
     <header>
@@ -25,4 +25,35 @@
         <p>Already have an account? <a href="/login">Login here</a></p>
     </main>
 </body>
+<script>
+    // Function to handle the form submission
+    function handleSubmit(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+        
+        // Get the form data
+        const formData = new FormData(event.target);
+        
+        // Make the POST request
+        fetch('/register', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Registration failed. Please try again.'); // Throw an error if the response is not ok
+            }
+            window.location.href = '/home'; // Redirect to the home page if the response is ok
+        })
+        .catch(error => {
+            // Display the error message
+            const errorMessage = document.createElement('p');
+            errorMessage.textContent = error.message;
+            document.body.appendChild(errorMessage);
+        });
+    }
+    
+    // Add event listener to the form submit event
+    const form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit);
+</script>
 </html>

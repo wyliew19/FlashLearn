@@ -9,17 +9,25 @@ class UserHandler:
     def login(self, user: str, password: str) -> User:
         print(f"DEBUG::User Handler::login({user}, {password})")
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        info = self._db.select_from_table("USER", email=user, password=password)
+        info = self._db.select_from_table("USER", email=user, password=hashed_password)
         if not info:
-            info = self._db.select_from_table("USER", name=user, password=password)
+            info = self._db.select_from_table("USER", name=user, password=hashed_password)
         if not info:
             return None
+        info = info[0]
+        print(f"DEBUG::User Handler::login::info: {info}")
         return User(info[0], info[1], info[3])
     
     def register(self, user: str, password: str, email: str):
         print(f"DEBUG::User Handler::register({user}, {password}, {email})")
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        self._db.insert_into_table("USER", name=user, password=hashed_password, email=email)
+        # Check if user already exists
+        try:
+            self._db.insert_into_table("USER", name=user, password=hashed_password, email=email)
+        except Exception as e:
+            print(e)
+            return None
+
         info = self.login(user, password)
         if not info:
             return None
@@ -30,5 +38,6 @@ class UserHandler:
         info = self._db.select_from_table("USER", email=email)
         if not info:
             return None
+        info = info[0]
         return User(info[0], info[1], info[3])
         
