@@ -40,4 +40,13 @@ class UserHandler:
             return None
         info = info[0]
         return User(info[0], info[1], info[3])
-        
+    
+    def change_password(self, email: str, password: str, new_pass: str) -> bool:
+        print(f"DEBUG::User Handler::change_password({email}, {password}, {new_pass})")
+        hashed_password = hashlib.sha256(new_pass.encode()).hexdigest()
+        if self.login(email, password) is None:
+            return False
+        self._db.update_table("USER", { "password" : hashed_password }, email=email)
+        if self.login(email, new_pass) is None:
+            raise Exception("Password change failed")
+        return True

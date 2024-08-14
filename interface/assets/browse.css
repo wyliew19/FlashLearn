@@ -1,0 +1,63 @@
+.browser-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10%;
+}
+
+.set-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 0 20px;
+}
+
+.set-container .button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.button-container .button {
+    background-color: #015ab9;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+}
+
+.button-container .button:hover {
+    background-color: #99caff;
+    color: black;
+}
+
+.button-container .button:active {
+    background-color: #015ab9;
+}
+
+.set-container .delete-button {
+    font-family: 'Kaisei Decol', serif;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+}
+
+.set-container .delete-button:hover {
+    background-color: #ff6666;
+    color: black;
+}
+
+.set-container .title {
+    font-size: 2em;
+    margin: 20px 0;
+    color: black;
+}

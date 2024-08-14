@@ -18,7 +18,7 @@ class DatabaseManager:
         self.create_tables()
 
 
-    def execute_query(self, query: str, params: Optional[tuple] = None) -> list:
+    def execute_query(self, query: str, params: Optional[list] = None) -> list[tuple]:
         with self.lock:  # Acquire lock
             cursor = self.connection.cursor()
             if params:
@@ -43,7 +43,7 @@ class DatabaseManager:
             '''
             CREATE TABLE IF NOT EXISTS SUPERSET (
                 id INTEGER PRIMARY KEY,
-                name TEXT,
+                title TEXT,
                 user_id INTEGER,
                 FOREIGN KEY (user_id) REFERENCES USER (id)
             )
@@ -51,7 +51,7 @@ class DatabaseManager:
             '''
             CREATE TABLE IF NOT EXISTS SUBSET (
                 id INTEGER PRIMARY KEY,
-                name TEXT,
+                title TEXT,
                 user_id INTEGER,
                 super_id INTEGER,
                 FOREIGN KEY (user_id) REFERENCES USER (id),
@@ -79,10 +79,11 @@ class DatabaseManager:
         self.connection.close()
 
     def insert_into_table(self, table_name: str, **kwargs) -> None:
+        print(f"DEBUG::DatabaseManager::insert_into_table({table_name}, {kwargs})")
         columns = ', '.join(str(x) for x in kwargs.keys())
         placeholders = ', '.join('?' * len(kwargs))
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-        self.execute_query(query, tuple(kwargs.values()))
+        self.execute_query(query, list(kwargs.values()))
 
     def select_from_table(self, table_name, *columns, **kwargs) -> list[tuple]:
         '''
@@ -97,7 +98,7 @@ class DatabaseManager:
         if kwargs:
             conditions = ' AND '.join(f"{key} = ?" for key in kwargs.keys())
             query += f" WHERE {conditions}"
-            return self.execute_query(query, tuple(kwargs.values()))
+            return self.execute_query(query, list(kwargs.values()))
         else:
             return self.execute_query(query)
         
@@ -106,9 +107,11 @@ class DatabaseManager:
         Sample usage:
           ```update_table("FLASHCARD", {"term": "new term"}, id=1)```
         this will update the term of the row in the FLASHCARD table where the flashcard's id is 1'''
-        query = f"UPDATE {table_name} SET {list(new_vals.keys())[0]} = ? WHERE {list(kwargs.keys())[0]} = ?"
-        return self.execute_query(query, tuple(new_vals.values()) + tuple(kwargs.values()))
+        for key, value in new_vals.items():
+            query = f"UPDATE {table_name} SET {key} = ? WHERE {list(kwargs.keys())[0]} = ?"
+            self.execute_query(query, (value, list(kwargs.values())[0]))
+            
     
     def remove_from_table(self, table_name: str, **kwargs) -> list[tuple]:
         query = f"DELETE FROM {table_name} WHERE {list(kwargs.keys())[0]} = ?"
-        return self.execute_query(query, tuple(kwargs.values()))
+        return self.execute_query(query, list(kwargs.values()))

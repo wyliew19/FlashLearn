@@ -16,7 +16,6 @@ from flashlearn.utils.database import DatabaseManager
 from flashlearn.models.user import User
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory=Path("./static").resolve()), name="static")
 app.mount("/assets", StaticFiles(directory=Path("./interface/assets").resolve()), name="assets")
 templates = Jinja2Templates(directory=Path("./interface").resolve())
 
@@ -40,7 +39,7 @@ def landing_page(request: Request):
 @app.get('/favicon.ico')
 async def favicon():
     file_name = "favicon.ico"
-    return FileResponse(Path(f"./static/{file_name}"), headers={"Content-Disposition": "attachment; filename=" + file_name})
+    return FileResponse(Path(f"./interface/assets/{file_name}"), headers={"Content-Disposition": "attachment; filename=" + file_name})
 
 
 # Login page
@@ -105,14 +104,30 @@ def home_page_post(request: Request, user: Annotated[User, Depends(get_current_u
 
 # Logout
 @app.get("/logout")
-def logout(response: Response):
+def logout():
+    response = RedirectResponse(url="/login")
     response.delete_cookie(key="access_token")
-    return RedirectResponse(url="/")
+    return response
+
+# Profile page
+@app.get("/profile")
+def profile_page(request: Request, user: Annotated[User, Depends(get_current_user)]):
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user})
+
+@app.post("/new_password")
+def new_password(current_password: str, password: str, 
+                 user: Annotated[User, Depends(get_current_user)], 
+                 handler: Annotated[UserHandler, Depends(get_user_handler)]):
+    if not handler.login(user.email, current_password):
+        raise HTTPException(status_code=401, detail="Invalid current password")
+    handler.change_password(user.email, password)
+    return RedirectResponse(url="/profile")
 
 # Get user sets
 @app.get("/sets")
-def get_sets(request: Request, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
-    sets = handler.get_user_sets(user.email)
+def get_sets(request: Request, user: Annotated[User, Depends(get_current_user)], 
+             handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    sets = handler.get_user_sets(user.id)
     return templates.TemplateResponse("sets.html", {"request": request, "sets": sets, "user": user})
 
 # Get set
@@ -127,9 +142,10 @@ def create_set_page(request: Request, user: Annotated[User, Depends(get_current_
     return templates.TemplateResponse("create_set.html", {"request": request, "user": user})
 
 @app.post("/create_set")
-def create_set(name: str, super_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
-    handler.create_set(name, user.email, super_id)
-    return RedirectResponse(url="/sets")
+def create_set(user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)],
+                name: str = Form()):
+    handler.create_set(name, user.id)
+    return {"name": name}
 
 # Subset creation
 @app.get("/create_set/{super_id}")
@@ -137,9 +153,10 @@ def create_set_page(request: Request, super_id: int, user: Annotated[User, Depen
     return templates.TemplateResponse("create_set.html", {"request": request, "user": user, "super_id": super_id})
 
 @app.post("/create_set/{super_id}")
-def create_set(name: str, super_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
-    handler.create_set(name, user.email, super_id)
-    return RedirectResponse(url="/sets")
+def create_set(super_id: int, user: Annotated[User, Depends(get_current_user)], 
+                handler: Annotated[SetHandler, Depends(get_set_handler)], name: str = Form()):
+    handler.create_set(name, user.id, super_id)
+    return {"super_id": super_id}
 
 # Create super set
 @app.get("/create_super_set")
@@ -149,7 +166,7 @@ def create_super_set_page(request: Request, user: Annotated[User, Depends(get_cu
 @app.post("/create_super_set")
 def create_super_set(name: str, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
     handler.create_super_set(name, user.email)
-    return RedirectResponse(url="/sets")
+    return {"name": name}
 
 # Create flashcard
 @app.get("/create_flashcard/{set_id}")
@@ -186,6 +203,18 @@ def edit_set(set_id: int, handler: Annotated[SetHandler, Depends(get_set_handler
         raise HTTPException(status_code=400, detail="Invalid request")
     
     return RedirectResponse(url=f"/edit_set/{set_id}")
+
+# Delete set
+@app.get("/delete_set/{set_id}")
+def delete_set_page(request: Request, set_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    handler.delete_set(set_id)
+    return RedirectResponse(url="/sets")
+
+# Delete super set
+@app.get("/delete_super_set/{super_id}")
+def delete_super_set_page(request: Request, super_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    handler.delete_super_set(super_id)
+    return RedirectResponse(url="/sets")
 
 # Edit super set
 @app.get("/edit_super_set/{super_id}")

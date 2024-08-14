@@ -4,25 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlashLearn - Home</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
 </head>
 <body>
-    <header>
-        <h1>Welcome, [Username]</h1>
-        <nav>
-            <a href="/profile">Profile</a>
-            <a href="/sets">Study Sets</a>
-            <a href="/logout">Logout</a>
-        </nav>
-    </header>
-    <main>
-        <h2>Your Study Dashboard</h2>
-        <p>Quick Stats:</p>
-        <ul>
-            <li>Total Flashcards: 50</li>
-            <li>Recent Scores: 85%</li>
-        </ul>
-        <a href="/sets">Go to your sets</a>
-    </main>
+    {% include 'navbar.html' %}
+    <div>
+        <h1>Welcome back {{ user.name }}!</h1>
+
+    </div>
 </body>
 </html>

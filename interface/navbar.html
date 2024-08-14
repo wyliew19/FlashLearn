@@ -1,7 +1,5 @@
-<link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
-
-<div class="top-bar">
-    <a class=message>Welcome, {{ user.name }}!</a>
+<div class="title-bar">
+    <a href="/profile/" class="message">{{ user.name }}</a>
     <h1 class="title">FlashLearn</h1>
     <a class="logout-button" href="/logout/">Logout</a>
 </div>

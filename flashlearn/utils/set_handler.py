@@ -8,10 +8,8 @@ class SetHandler:
     def __init__(self):
         self._db = DatabaseManager()
 
-    def create_set(self, name: str, email: str, super_id: Optional[int]):
-        print(f"DEBUG::Set Handler::create_set(\"{name}\", {email}, {super_id})")
-        # Get user ID
-        user_id = self._db.select_from_table("USER", email=email)[0]
+    def create_set(self, name: str, user_id: int, super_id: Optional[int] = None) -> Set:
+        print(f"DEBUG::Set Handler::create_set(\"{name}\", {user_id}, {super_id})")
         # Insert set into database
         if super_id is None:
             self._db.insert_into_table("SUBSET", title=name, user_id=user_id)
@@ -96,9 +94,19 @@ class SetHandler:
     def delete_set(self, set_id: int):
         print(f"DEBUG::Set Handler::delete_set({set_id})")
         # Delete set from database
-        self._db.delete_from_table("SUBSET", set_id)
+        self._db.remove_from_table("SUBSET", id=set_id)
         # Return True if set is deleted
         info = self._db.select_from_table("SUBSET", id=set_id)
+        if not info:
+            return True
+        return False
+    
+    def delete_super_set(self, super_id: int):
+        print(f"DEBUG::Set Handler::delete_super_set({super_id})")
+        # Delete super set from database
+        self._db.remove_from_table("SUPERSET", id=super_id)
+        # Return True if super set is deleted
+        info = self._db.select_from_table("SUPERSET", id=super_id)
         if not info:
             return True
         return False
