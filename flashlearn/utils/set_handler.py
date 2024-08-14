@@ -107,6 +107,7 @@ class SetHandler:
         print(f"DEBUG::Set Handler::delete_set({set_id})")
         # Delete set from database
         self._db.remove_from_table("SUBSET", id=set_id)
+        self._db.remove_from_table("FLASHCARD", set_id=set_id)
         # Return True if set is deleted
         info = self._db.select_from_table("SUBSET", id=set_id)
         if not info:
@@ -196,5 +197,8 @@ class SetHandler:
             cards = self._get_unstudied_cards(set_id)
         else:
             cards = self._get_unstudied_cards(self.get_card(card_id).set_id)
+
+        if not cards:
+            return None
         # Return random card
         return random.choice(cards)

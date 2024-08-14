@@ -114,6 +114,10 @@ def logout():
 def profile_page(request: Request, user: Annotated[User, Depends(get_current_user)]):
     return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 
+@app.post("/profile")
+def profile_page_post(request: Request, user: Annotated[User, Depends(get_current_user)]):
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user})
+
 @app.post("/new_password")
 def new_password(current_password: str, password: str, 
                  user: Annotated[User, Depends(get_current_user)], 
@@ -256,26 +260,30 @@ def delete_flashcard_page(request: Request, card_id: int, user: Annotated[User, 
     handler.delete_card(card_id)
     return RedirectResponse(url=f"/set/{set_id}")
 
+# Study mode
 @app.get("/study/new_session/{set_id}")
 def new_study_session(request: Request, set_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
-    card_id = handler.get_next_unstudied_card(set_id=set_id)
-    return RedirectResponse(url=f"/study/new_card/{card_id}")
+    card = handler.get_next_unstudied_card(set_id=set_id)
+    if card is None:
+        return RedirectResponse(url="/sets")
+    return RedirectResponse(url=f"/study/{card.id}")
 
-# Study mode
 @app.get("/study/{card_id}")
 def study_page(request: Request, card_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
     card = handler.get_card(card_id)
     return templates.TemplateResponse("study.html", {"request": request, "user": user, "card": card})
 
-@app.post("/study/studied/{card_id}")
+@app.get("/study/studied/{card_id}")
 def mark_card_as_studied(card_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)]):
     card = handler.study_card(card_id)
     return RedirectResponse(url=f"/study/new_card/{card.id}")
 
-@app.post("/study/new_card/{card_id}")
+@app.get("/study/new_card/{card_id}")
 def get_next_unstudied_card(card_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)]):
-    next_card_id = handler.get_next_unstudied_card(card_id=card_id)
-    return {"next_card_id": next_card_id}
+    next_card = handler.get_next_unstudied_card(card_id=card_id)
+    if next_card is None:
+        return RedirectResponse(url="/sets")
+    return RedirectResponse(url=f"/study/{next_card.id}")
 
 ### Run the server ###
 if __name__ == "__main__":

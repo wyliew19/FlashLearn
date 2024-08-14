@@ -21,7 +21,7 @@
                             {% if set.kind == 'super_set' %}
                                 <a href="/create_set/{{ set.id }}" class="button">Create Set</a>
                             {% else %}
-                                <a href="/study/{{ set.id }}" class="button">Study</a>
+                                <a href="/study/new_session/{{ set.id }}" class="button">Study</a>
                             {% endif %}
                             <a href="/delete_{{ set.kind }}/{{ set.id }}" class="delete-button">Delete</a>
                         </div>

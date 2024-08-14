@@ -4,45 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlashLearn - Study Mode</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='study.css') }} ">
 </head>
 <body>
+    {% include 'navbar.html' %}
     <header>
         <h1>Study Mode</h1>
-        <nav>
-            <a href="/home">Home</a>
-            <a href="/sets">Back to Sets</a>
-        </nav>
     </header>
     <main>
-        <div class="flashcard">
-            <div class="question">Define evolution.</div>
-            <div class="answer" style="display:none;">Evolution is the process by which different kinds of living organisms are thought to have developed and diversified from earlier forms during the history of the earth.</div>
-            <button onclick="flipCard()">Show Answer</button>
+        <div class="flip-card">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <h1>{{ card.term }}</h1>
+                </div>
+                <div class="flip-card-back">
+                    <h1>{{ card.body }}</h1>
+                </div>
+            </div>
         </div>
-        <div class="progress">
-            <button onclick="rateDifficulty('easy')">Easy</button>
-            <button onclick="rateDifficulty('medium')">Medium</button>
-            <button onclick="rateDifficulty('hard')">Hard</button>
+        <div class="button-container">
+            <a href="/study/new_card/{{ card.id }}" class="button">Skip</a>
+            <a href="/study/studied/{{ card.id }}" class="button">Studied!</a>
         </div>
-    </main>
-    <script>
-        function flipCard() {
-            const question = document.querySelector('.question');
-            const answer = document.querySelector('.answer');
-            if (answer.style.display === 'none') {
-                question.style.display = 'none';
-                answer.style.display = 'block';
-            } else {
-                question.style.display = 'block';
-                answer.style.display = 'none';
-            }
-        }
-
-        function rateDifficulty(difficulty) {
-            // Placeholder for rating difficulty - integrate with backend
-            console.log(`Rated ${difficulty}`);
-        }
-    </script>
 </body>
 </html>
