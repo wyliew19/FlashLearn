@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashLearn - Edit Super Set</title>
+    <link rel="stylesheet" href="{{ url_for('assets', path='base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('assets', path='navbar.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <header>
+        <h1>Rename {{ super_set.title }}</h1>
+    </header>
+    <main>
+        <form action="" method="POST">
+            <label for="name">Rename your super set:</label>
+            <input type="text" id="name" name="name" required style="width: 25%; height: fit-content; font-size: large;"
+                        value="{{ super_set.title }}">
+            <button type="submit">Rename Super Set</button>
+        </form>
+    </main>
+</body>
+</html>

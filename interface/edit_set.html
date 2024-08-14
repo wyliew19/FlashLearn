@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlashLearn - Create Set</title>
+    <title>FlashLearn - Edit Set</title>
     <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
     <link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
 </head>
 <body>
     {% include 'navbar.html' %}
     <header>
-        <h1>Create a Set</h1>
+        <h1>Rename {{ set.title }}</h1>
     </header>
     <main>
         <form method="POST">
-            <label for="name">Name your set:</label>
-            <input type="text" id="name" name="name" required style="width: 25%; height: fit-content; font-size: large;">
-            <button type="submit">Create Set</button>
+            <label for="name">Rename your set:</label>
+            <input type="text" id="name" name="name" required style="width: 25%; height: fit-content; font-size: large;"
+                        value="{{ set.title }}">
+            <button type="submit">Rename Set</button>
         </form>
     </main>
 </body>

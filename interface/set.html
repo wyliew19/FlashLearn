@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashLearn - {{ set.title }}</title>
+    <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='browse.css') }} ">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% if set.cards %}
+        <div>
+            <h1>{{ set.title }}<a onclick="window.location.href='/edit_set/{{ set.id }}'">
+                <img src=" {{ url_for('assets', path='edit.png') }} " alt="Edit Set" style="width: 30px; height: 30px;">
+            </a></h1>
+            <a class="create-button" onclick="window.location.href='/create_flashcard/{{ set.id }}'">Create Flashcard</a>
+            <div class="browser-container">
+                {% for card in set.cards %}
+                    <div class="item-container">
+                        <h2 class="title" onclick="window.location.href='/edit_flashcard/{{ card.id }}'">{{ card.term }}</h2>
+                        <p class="description">{{ card.body }}</p>
+                        <div class="button-container">
+                            <a href="/edit_flashcard/{{ card.id }}" class="button">Edit</a>
+                            <a href="/delete_flashcard/{{ card.id }}" class="delete-button">Delete</a>
+                        </div>
+                    </div> 
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div>
+            <h1>{{ set.title }} has no flashcards.</h1>
+            <p>You have not created any flashcards for this set yet. <a href="/create_flashcard/{{ set.id }}">Create a Flashcard</a></p>
+        </div>
+    {% endif %}
+</html>

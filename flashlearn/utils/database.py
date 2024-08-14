@@ -96,7 +96,7 @@ class DatabaseManager:
         else:
             query = f"SELECT * FROM {table_name}"
         if kwargs:
-            conditions = ' AND '.join(f"{key} = ?" for key in kwargs.keys())
+            conditions = ' AND '.join(f"{key} IS ?" for key in kwargs.keys())
             query += f" WHERE {conditions}"
             return self.execute_query(query, list(kwargs.values()))
         else:

@@ -64,3 +64,18 @@ form button:hover {
     background-color: #99caff;
     color: black;
 }
+
+form[input="text"] {
+    width: 25%;
+    height: fit-content;
+    font-size: large;
+}
+
+form textarea {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #3131ff;
+    border-radius: 5px;
+    resize: none;
+    font-size: small;
+}

@@ -1,4 +1,5 @@
 from typing import Optional
+import random
 
 from flashlearn.utils.database import DatabaseManager
 from flashlearn.models.card import Card
@@ -66,7 +67,7 @@ class SetHandler:
     def get_user_sets(self, user_id: int) -> list[AbstractSet]:
         print(f"DEBUG::Set Handler::get_user_sets({user_id})")
         # Get sets and super sets
-        sets = self._db.select_from_table("SUBSET", user_id=user_id)
+        sets = self._db.select_from_table("SUBSET", user_id=user_id, super_id=None)
         super_sets = self._db.select_from_table("SUPERSET", user_id=user_id)
         # Return list of sets and super sets
         return ([Set(info[0], info[1], self._populate_set(info[0])) for info in sets] 
@@ -90,6 +91,17 @@ class SetHandler:
             return None
         info = info[0]
         return Set(info[0], info[1], self._populate_set(set_id))
+    
+    def edit_super_set(self, super_id: int, new_title: str):
+        print(f"DEBUG::Set Handler::edit_super_set({super_id}, \"{new_title}\")")
+        # Update super set title
+        self._db.update_table("SUPERSET", {"title": new_title}, id=super_id)
+        # Return updated super set object if found
+        info = self._db.select_from_table("SUPERSET", id=super_id)
+        if not info:
+            return None
+        info = info[0]
+        return SuperSet(info[0], info[1], self._populate_super_set(super_id))
 
     def delete_set(self, set_id: int):
         print(f"DEBUG::Set Handler::delete_set({set_id})")
@@ -105,7 +117,7 @@ class SetHandler:
         print(f"DEBUG::Set Handler::delete_super_set({super_id})")
         # Delete super set from database
         self._db.remove_from_table("SUPERSET", id=super_id)
-        # Return True if super set is deleted
+        self._db.remove_from_table("SUBSET", super_id=super_id)
         info = self._db.select_from_table("SUPERSET", id=super_id)
         if not info:
             return True
@@ -127,6 +139,8 @@ class SetHandler:
         # Get card info
         info = self._db.select_from_table("FLASHCARD", id=card_id)
         # Return card object
+        if not info:
+            return None
         info = info[0]
         return Card(*info)
     
@@ -151,7 +165,7 @@ class SetHandler:
     def delete_card(self, card_id: int):
         print(f"DEBUG::Set Handler::delete_card({card_id})")
         # Delete card from database
-        self._db.delete_from_table("FLASHCARD", card_id)
+        self._db.remove_from_table("FLASHCARD", id=card_id)
         # Return True if card is deleted
         info = self._db.select_from_table("FLASHCARD", id=card_id)
         if not info:
@@ -169,11 +183,18 @@ class SetHandler:
         info = info[0]
         return Card(*info)
     
-    def get_unstudied_cards(self, card_id: int) -> list[Card]:
-        print(f"DEBUG::Set Handler::get_unstudied_cards({card_id})")
-        # Get card info
-        info = self._db.select_from_table("FLASHCARD", id=card_id)
-        card = Card(*info)
+    def _get_unstudied_cards(self, set_id: int) -> list[Card]:
+        print(f"DEBUG::Set Handler::get_unstudied_cards({set_id})")
         # Get unstudied cards
-        cards = self._db.select_from_table("FLASHCARD", set_id=card.set_id, studied=False)
+        cards = self._db.select_from_table("FLASHCARD", set_id=set_id, studied=False)
         return [Card(*info) for info in cards]
+
+    def get_next_unstudied_card(self, card_id: int | None = None, set_id: int | None = None) -> Card:
+        print(f"DEBUG::Set Handler::get_next_unstudied_card({card_id}, {set_id})")
+        # Get unstudied cards
+        if set_id:
+            cards = self._get_unstudied_cards(set_id)
+        else:
+            cards = self._get_unstudied_cards(self.get_card(card_id).set_id)
+        # Return random card
+        return random.choice(cards)

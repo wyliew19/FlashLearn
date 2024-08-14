@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashLearn - Edit Card</title>
+    <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <header>
+        <h1>Edit {{ card.term }}</h1>
+    </header>
+    <main>
+        <form action="" method="POST" id="create">
+            <label for="term">Term:</label>
+            <input type="text" id="term" name="term" value="{{ card.term }}" style="width: 40%; height: 50px; font-size: larger;" required>
+            <label for="definition">Definition:</label>
+            <textarea id="definition" name="body" rows="10" cols="100" required>{{ card.body }}</textarea>
+            <button type="submit">Create Card</button>
+        </form>
+    </main>
+</body>
+</html>

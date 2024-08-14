@@ -2,21 +2,34 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 10%;
+    margin-top: 10%;
 }
 
-.set-container {
+.item-container {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     margin: 0 auto;
     max-width: 1200px;
+    width: 60%;
     padding: 0 20px;
+    background-color: #f0f0f0;
+    transition: background 0.3s ease-in-out;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #727272;
 }
 
-.set-container .button-container {
-    display: flex;
+.item-container:hover {
+    background-color: #e0e0e0;
+}
+
+.item-container .button-container {
+    display: grid;
     justify-content: space-between;
     width: 100%;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
 }
 
 .button-container .button {
@@ -39,7 +52,7 @@
     background-color: #015ab9;
 }
 
-.set-container .delete-button {
+.item-container .delete-button {
     font-family: 'Kaisei Decol', serif;
     background-color: #ff0000;
     color: white;
@@ -51,13 +64,37 @@
     transition: color 0.3s ease-in-out;
 }
 
-.set-container .delete-button:hover {
+.item-container .delete-button:hover {
     background-color: #ff6666;
     color: black;
 }
 
-.set-container .title {
+.item-container .title {
     font-size: 2em;
     margin: 20px 0;
+    color: black;
+}
+
+.item-container .description {
+    font-size: small;
+    margin: 10px 0;
+    padding-top: 10px;
+    border-top: 1px solid #727272;
+    color: black;
+}
+
+.create-button {
+    width: 25%;
+    background-color: #00f;
+    color: white;
+    border: 1px solid #3131ff;
+    border-radius: 5px;
+    padding: 4px;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+}
+
+.create-button:hover {
+    background-color: #99caff;
     color: black;
 }

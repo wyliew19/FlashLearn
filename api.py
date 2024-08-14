@@ -130,11 +130,33 @@ def get_sets(request: Request, user: Annotated[User, Depends(get_current_user)],
     sets = handler.get_user_sets(user.id)
     return templates.TemplateResponse("sets.html", {"request": request, "sets": sets, "user": user})
 
+@app.post("/sets")
+def get_sets_post(request: Request, user: Annotated[User, Depends(get_current_user)],
+                    handler: Annotated[SetHandler, Depends(get_set_handler)]):
+        sets = handler.get_user_sets(user.id)
+        return templates.TemplateResponse("sets.html", {"request": request, "sets": sets, "user": user})
+
 # Get set
 @app.get("/set/{set_id}")
 def get_set(request: Request, set_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
     set = handler.get_set(set_id)
     return templates.TemplateResponse("set.html", {"request": request, "set": set, "user": user})
+
+@app.post("/set/{set_id}")
+def get_set_post(request: Request, set_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    set = handler.get_set(set_id)
+    return templates.TemplateResponse("set.html", {"request": request, "set": set, "user": user})
+
+# Get super set
+@app.get("/super_set/{super_id}")
+def get_super_set(request: Request, super_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    super_set = handler.get_super_set(super_id)
+    return templates.TemplateResponse("super_set.html", {"request": request, "super_set": super_set, "user": user})
+
+@app.post("/super_set/{super_id}")
+def get_super_set_post(request: Request, super_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    super_set = handler.get_super_set(super_id)
+    return templates.TemplateResponse("super_set.html", {"request": request, "super_set": super_set, "user": user})
 
 # Create set
 @app.get("/create_set")
@@ -145,7 +167,7 @@ def create_set_page(request: Request, user: Annotated[User, Depends(get_current_
 def create_set(user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)],
                 name: str = Form()):
     handler.create_set(name, user.id)
-    return {"name": name}
+    return RedirectResponse(url="/sets")
 
 # Subset creation
 @app.get("/create_set/{super_id}")
@@ -156,7 +178,7 @@ def create_set_page(request: Request, super_id: int, user: Annotated[User, Depen
 def create_set(super_id: int, user: Annotated[User, Depends(get_current_user)], 
                 handler: Annotated[SetHandler, Depends(get_set_handler)], name: str = Form()):
     handler.create_set(name, user.id, super_id)
-    return {"super_id": super_id}
+    return RedirectResponse(url=f"/super_set/{super_id}")
 
 # Create super set
 @app.get("/create_super_set")
@@ -164,9 +186,10 @@ def create_super_set_page(request: Request, user: Annotated[User, Depends(get_cu
     return templates.TemplateResponse("create_super_set.html", {"request": request, "user": user})
 
 @app.post("/create_super_set")
-def create_super_set(name: str, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
-    handler.create_super_set(name, user.email)
-    return {"name": name}
+def create_super_set(user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)],
+                     name: str = Form()):
+    handler.create_super_set(name, user.id)
+    return RedirectResponse(url="/sets")
 
 # Create flashcard
 @app.get("/create_flashcard/{set_id}")
@@ -187,22 +210,9 @@ def edit_set_page(request: Request, set_id: int, user: Annotated[User, Depends(g
     return templates.TemplateResponse("edit_set.html", {"request": request, "user": user, "set": set})
 
 @app.post("/edit_set/{set_id}")
-def edit_set(set_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)],
-             new_title: str | None = None, delete_card: int | None = None, delete_set: bool | None = None):
-    
-    if new_title:
-        handler.edit_set(set_id, new_title)
-    elif delete_card:
-        if not handler.delete_card(delete_card):
-            raise HTTPException(status_code=500, detail="Failed to delete card")
-    elif delete_set:
-        if not handler.delete_set(delete_set):
-            raise HTTPException(status_code=500, detail="Failed to delete set")
-        return RedirectResponse(url="/sets")
-    else:
-        raise HTTPException(status_code=400, detail="Invalid request")
-    
-    return RedirectResponse(url=f"/edit_set/{set_id}")
+def edit_set(set_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)], name: str = Form()):
+    handler.edit_set(set_id, name)
+    return RedirectResponse(url=f"/set/{set_id}")
 
 # Delete set
 @app.get("/delete_set/{set_id}")
@@ -223,18 +233,9 @@ def edit_super_set_page(request: Request, super_id: int, user: Annotated[User, D
     return templates.TemplateResponse("edit_super_set.html", {"request": request, "user": user, "super_set": super_set})
 
 @app.post("/edit_super_set/{super_id}")
-def edit_super_set(super_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)], new_title: str | None = None, delete_set: bool | None = None):
-        
-        if new_title:
-            handler.edit_super_set(super_id, new_title)
-        elif delete_set:
-            if not handler.delete_set(delete_set):
-                raise HTTPException(status_code=500, detail="Failed to delete set")
-            return RedirectResponse(url="/sets")
-        else:
-            raise HTTPException(status_code=400, detail="Invalid request")
-        
-        return RedirectResponse(url=f"/edit_super_set/{super_id}")
+def edit_super_set(super_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)], name: str = Form()):
+    handler.edit_super_set(super_id, name)
+    return RedirectResponse(url=f"/super_set/{super_id}")
 
 # Edit flashcard
 @app.get("/edit_flashcard/{card_id}")
@@ -244,20 +245,21 @@ def edit_flashcard_page(request: Request, card_id: int, user: Annotated[User, De
 
 @app.post("/edit_flashcard/{card_id}")
 def edit_flashcard(card_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)],
-                   term: Annotated[str | None, Form()], body: Annotated[str | None, Form()],
-                     delete: int | None = None):
-    
-    if delete:
-        if not handler.delete_card(card_id):
-            raise HTTPException(status_code=500, detail="Failed to delete card")
-        return RedirectResponse(url="/sets")
-    
-    elif term or body:
-        handler.edit_card(card_id, term, body)
-    else:
-        raise HTTPException(status_code=400, detail="Invalid request")
-    
-    return RedirectResponse(url=f"/edit_flashcard/{card_id}")
+                   term: Annotated[str | None, Form()], body: Annotated[str | None, Form()]):
+    card = handler.edit_card(card_id, term, body)
+    return RedirectResponse(url=f"/set/{card.set_id}")
+
+# Delete flashcard
+@app.get("/delete_flashcard/{card_id}")
+def delete_flashcard_page(request: Request, card_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    set_id = handler.get_card(card_id).set_id
+    handler.delete_card(card_id)
+    return RedirectResponse(url=f"/set/{set_id}")
+
+@app.get("/study/new_session/{set_id}")
+def new_study_session(request: Request, set_id: int, user: Annotated[User, Depends(get_current_user)], handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    card_id = handler.get_next_unstudied_card(set_id=set_id)
+    return RedirectResponse(url=f"/study/new_card/{card_id}")
 
 # Study mode
 @app.get("/study/{card_id}")
@@ -265,27 +267,15 @@ def study_page(request: Request, card_id: int, user: Annotated[User, Depends(get
     card = handler.get_card(card_id)
     return templates.TemplateResponse("study.html", {"request": request, "user": user, "card": card})
 
-@app.post("/study/{card_id}")
-def study_card(card_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)], studied: bool | None = None, cancel: bool | None = None):
-    if cancel:
-        return RedirectResponse(url="/sets")
-    elif studied is not None:
-        if studied:
-            handler.study_card(card_id)
-        unstudies = handler.get_unstudied_cards(card_id)
-        # If there are no unstudied cards or only one unstudied card and the current card is skipped, return to sets page
-        if not unstudies or len(unstudies) == 1 and studied == False:
-            return RedirectResponse(url="/sets")
-        # If card is studied, go to the first unstudied card
-        if studied == True:
-            return RedirectResponse(url=f"/study/{unstudies[0].id}")
-        # If card is skipped, go to the next card
-        else:
-            return RedirectResponse(url=f"/study/{unstudies[1].id}")
-    else:
-        raise HTTPException(status_code=400, detail="Invalid request")
+@app.post("/study/studied/{card_id}")
+def mark_card_as_studied(card_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    card = handler.study_card(card_id)
+    return RedirectResponse(url=f"/study/new_card/{card.id}")
 
-
+@app.post("/study/new_card/{card_id}")
+def get_next_unstudied_card(card_id: int, handler: Annotated[SetHandler, Depends(get_set_handler)]):
+    next_card_id = handler.get_next_unstudied_card(card_id=card_id)
+    return {"next_card_id": next_card_id}
 
 ### Run the server ###
 if __name__ == "__main__":

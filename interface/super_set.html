@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashLearn - {{ super_set.title }}</title>
+    <link rel="stylesheet" href=" {{ url_for('assets', path='base.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='navbar.css') }} ">
+    <link rel="stylesheet" href=" {{ url_for('assets', path='browse.css') }} ">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% if super_set.sets %}
+        <div>
+            <h1>{{ super_set.title }}<a onclick="window.location.href='/edit_super_set/{{ super_set.id }}'">
+                <img src=" {{ url_for('assets', path='edit.png') }} " alt="Edit Set" style="width: 30px; height: 30px;">
+            </a></h1>
+            <a class="create-button" onclick="window.location.href='/create_set/{{ super_set.id }}'">Create Set</a>
+            <div class="browser-container">
+                {% for set in super_set.sets %}
+                    <div class="item-container" onclick="window.location.href='/{{ set.kind }}/{{ set.id }}'">
+                        <h2 class="title">{{ set.title }}</h2>
+                        <div class="button-container">
+                            <a href="/study/{{ set.id }}" class="button">Study</a>
+                            <a href="/delete_set/{{ set.id }}" class="delete-button">Delete</a>
+                        </div>
+                    </div> 
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div>
+            <h1>{{ super_set.title }} has no subsets.</h1>
+            <p>You have not created any sets yet. <a href="/create_set/{{ super_set.id }}">Create a Set</a></p>
+        </div>
+    {% endif %}
+</html>
