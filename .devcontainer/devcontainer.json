@@ -6,6 +6,6 @@
 	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip install -r requirements.txt && echo 'alias run=\"uvicorn api:app --workers 4 --reload\"\n' >> ~/.bashrc"
+	"postCreateCommand": "pip install -r requirements.txt && echo 'alias run=\"uvicorn api:app --workers 4\"\n' >> ~/.bashrc"
 
 }
